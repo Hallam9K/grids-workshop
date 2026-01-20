@@ -1,6 +1,6 @@
 const canvasSize = 1000;
 const numberOfCells = 40;
-const numberOfBoxes = 20;
+const numberOfBoxes = 100;
 
 const box = []
 const boxVelocity = [];
@@ -8,18 +8,20 @@ const boxSize = canvasSize / numberOfCells;
 const boxColor = [];
 let speed = 10;
 
+// For the snake's segments
 const oldPos = [];
 
 function setup() {
   createCanvas(canvasSize, canvasSize);
 
-  // Create boxes
-  for (let i = 0; i < 100; i++) {
+  // Create 100 boxes, give them random colours
+  for (let i = 0; i < numberOfBoxes; i++) {
     box.push({ x: canvasSize / 2, y: canvasSize / 2 });
     boxVelocity.push({ x: 0, y: 0 });
     boxColor.push(getRandomColor());
   }
 
+  // Create positions for the snake's segments
   for (let k = 0; k < 20; k++) {
     oldPos.push({ x: canvasSize / 2, y: canvasSize / 2 })
   }
@@ -27,7 +29,7 @@ function setup() {
   fill(255, 0, 0);
 }
 
-// If off the canvas
+// If nearly off the canvas
 function outOfBounds(num = 0) {
   if (box[num].x + 50 > canvasSize + (boxSize / 2))
     return 1; // Right
@@ -45,22 +47,27 @@ let cooldown = 0;
 function moveBoxes() {
   timer++;
   for (let i = 0; i < box.length; i++) {
+    // Determines where the box should change velocity and stick to
     let moveIntervals = boxSize * 4;
 
     switch (outOfBounds(i)) {
+      // If not out of bounds
       default:
         if (cooldown-- >= 0)
           break;
 
+        // 0 - Do nothing | 1 - Change angle to horizontal | 2 - Change angle to vertical
         let changeDir = random([0, 1, 2]);
-        // Randomly change direction
+        // If the box's x aligns with a cross section in the path
         if (box[i].x % moveIntervals == 0 && changeDir == 1) {
 
+          // Randomly choose a new direction (Right or Left)
           let moveDir = random([0, 1]) == 0 ? true : false;
           if (moveDir) {
             boxVelocity[i].x = -speed;
             boxVelocity[i].y = 0;
 
+            // Snap box's y position to be within the path
             box[i].y = (Math.round(box[i].y / moveIntervals) * moveIntervals);
 
           }
@@ -70,8 +77,10 @@ function moveBoxes() {
 
             box[i].y = (Math.round(box[i].y / moveIntervals) * moveIntervals);
           }
+          // Don't try to change angle for 50 frames
           cooldown = 50;
         }
+        // If the box's y aligns with a cross section in the path
         else if (box[i].y % (Math.round(box[i].y / moveIntervals) * moveIntervals) == 0 && changeDir == 2) {
 
           let moveDir = random([0, 1]) == 0 ? true : false;
@@ -91,31 +100,32 @@ function moveBoxes() {
         }
         break;
       // If Out of Bounds
-      case 1:
+      case 1: // Right
         boxVelocity[i].x = -speed;
         boxVelocity[i].y = 0;
 
         box[i].y = Math.round(box[i].y / moveIntervals) * moveIntervals;
         break;
-      case 2:
+      case 2: // Left
         boxVelocity[i].x = speed;
         boxVelocity[i].y = 0;
 
         box[i].y = Math.round(box[i].y / moveIntervals) * moveIntervals;
         break;
-      case 3:
+      case 3: // Down
         boxVelocity[i].y = -speed;
         boxVelocity[i].x = 0;
 
         box[i].x = Math.round(box[i].x / moveIntervals) * moveIntervals;
         break;
-      case 4:
+      case 4: // Up
         boxVelocity[i].y = speed;
         boxVelocity[i].x = 0;
 
         box[i].x = Math.round(box[i].x / moveIntervals) * moveIntervals;
         break;
     }
+    // Wait before moving the boxes
     if (timer >= 30) {
       box[i].x += boxVelocity[i].x;
       box[i].y += boxVelocity[i].y;
@@ -154,9 +164,11 @@ function getRandomColor() {
 
 function draw() {
   background(0);
+  // No outlines
   strokeWeight(0);
 
   // Make Strips
+  // Uses sin() to make the colour pulsate
   fill((Math.sin(timer / 50) * 100), 0, 100 + (Math.sin(timer / 10) * 20));
   for (let i = 0; i < boxSize + 1; i++) {
     if (i % 2 != 0)
@@ -169,6 +181,8 @@ function draw() {
 
   moveBoxes();
 
+  // Sets positions of the snake's segments
+  // oldPos with indeces >0 are set before 0 so they get set to what 0 was the last frame
   for (let k = oldPos.length - 1; k > 0; k--) {
     oldPos[k].x = oldPos[k - 1].x;
     oldPos[k].y = oldPos[k - 1].y;
@@ -178,11 +192,13 @@ function draw() {
 
   for (let i = 0; i < box.length; i++) {
 
+    // Draw snake
     for (let k = 0; k < oldPos.length; k++) {
       fill(255 + (Math.sin(timer / 10) * 50), 255 - (Math.sin(timer / 10) * 50), 0);
       square(oldPos[k].x - (boxSize / 2), oldPos[k].y - (boxSize / 2), boxSize);
     }
 
+    // Draw boxes
     fill(boxColor[i]);
     square(box[i].x - (boxSize / 2), box[i].y - (boxSize / 2), boxSize);
   }
