@@ -1,6 +1,7 @@
 p5.disableFriendlyErrors = true; // hush
 let bDoExportSvg = false; 
 
+let autoButton;
 function setup() {
   createCanvas(1600, 800);
   background(0);
@@ -8,6 +9,25 @@ function setup() {
   noFill();
   stroke(255, 100, 0);
   strokeWeight(5);
+
+  // Create a button and place it
+  autoButton = createButton('Auto (OFF)');
+  autoButton.position(1600 - 210, 10);
+  autoButton.size(200, 50);
+  autoButton.style("font-size", "32px");
+  autoButton.style('background-color', color(100,100,255));
+
+  // Call autoToggle() when the button is pressed
+  autoButton.mousePressed(autoToggle);
+}
+
+let auto = false;
+function autoToggle(){
+  auto = !auto;
+  if (auto)
+    autoButton.html("Auto (ON)");
+  else
+    autoButton.html("Auto (OFF)");
 }
 
 function keyPressed(){
@@ -24,6 +44,7 @@ function polarToCartesianY(r, angle) {
   return height / 2 - r * sin(angle);
 }
 
+// Increase speed when mouse wheel is scrolled
 function mouseWheel() {
   speed += 5;
 }
@@ -42,17 +63,25 @@ function draw() {
 
   let angle = 0;
 
+  // Deaccelerate speed
   speed *= 0.97;
+  // Speed cannot be below 0
   speed = Math.max(speed, 0);
   progress += speed;
 
+  // If the auto button was pressed, increase progress constantly
+  if (auto)
+    progress += 15;
+
+  // If max progress is reached, reset progress
   if (progress > maxProgress) {
     progress = 20;
     background(0)
   }
 
-  stroke(progress / (maxProgress / 2), progress / (maxProgress / 2), progress / (maxProgress / 2));
+  stroke(255 * progress / (maxProgress / 2), progress / (maxProgress / 2), 255 *progress / (maxProgress / 2));
 
+  // Create pink spiral
   while (angle < progress) {
     let radius = angle;
 
@@ -68,8 +97,9 @@ function draw() {
 
   beginShape();
 
-  stroke(255 * progress / (maxProgress / 2), 255 * progress / (maxProgress / 2), 255 * progress / (maxProgress / 2));
+  stroke(progress / (maxProgress / 2), 255 * progress / (maxProgress / 2), 255 * progress / (maxProgress / 2));
 
+  // Create cyan spiral going the opposite way
   let angle2 = 0;
   while (angle2 > -progress) {
     let radius = angle2;
