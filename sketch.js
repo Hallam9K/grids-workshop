@@ -1,5 +1,5 @@
 p5.disableFriendlyErrors = true; // hush
-let bDoExportSvg = false; 
+let bDoExportSvg = false;
 
 let autoButton;
 function setup() {
@@ -15,14 +15,14 @@ function setup() {
   autoButton.position(1600 - 210, 10);
   autoButton.size(200, 50);
   autoButton.style("font-size", "32px");
-  autoButton.style('background-color', color(100,100,255));
+  autoButton.style('background-color', color(100, 100, 255));
 
   // Call autoToggle() when the button is pressed
   autoButton.mousePressed(autoToggle);
 }
 
 let auto = false;
-function autoToggle(){
+function autoToggle() {
   auto = !auto;
   if (auto)
     autoButton.html("Auto (ON)");
@@ -30,9 +30,9 @@ function autoToggle(){
     autoButton.html("Auto (OFF)");
 }
 
-function keyPressed(){
-  if (key == 's'){ 
-    bDoExportSvg = true; 
+function keyPressed() {
+  if (key == 's') {
+    bDoExportSvg = true;
   }
 }
 
@@ -55,7 +55,7 @@ let speed = 0;
 const maxProgress = 720 * 40;
 function draw() {
 
-  if (bDoExportSvg){
+  if (bDoExportSvg) {
     beginRecordSvg(this, "myOutput.svg");
   }
 
@@ -79,7 +79,7 @@ function draw() {
     background(0)
   }
 
-  stroke(255 * progress / (maxProgress / 2), progress / (maxProgress / 2), 255 *progress / (maxProgress / 2));
+  stroke(255 * progress / (maxProgress / 2), progress / (maxProgress / 2), 255 * progress / (maxProgress / 2));
 
   // Create pink spiral
   while (angle < progress) {
@@ -114,7 +114,7 @@ function draw() {
 
   endShape();
 
-  if (bDoExportSvg){
+  if (bDoExportSvg) {
     endRecordSvg();
     bDoExportSvg = false;
   }
